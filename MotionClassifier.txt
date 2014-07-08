@@ -1,0 +1,14 @@
+
+sample.rows = 8
+sample.columns = 24
+interval.nrSamples = 150
+emgProvider.bufferWarning = 5
+blockingQueue.maxWaitTime = 5000
+trainer.baseDir = C:\Tmp\Trainer\
+trainer.trainingsSize = 3000
+trainer.nrRuns = 1
+
+#properties for the logger
+#allowed values are 0 - 5 with 0 = trace and 5 = fatal
+logger.level = 1
+logger.file = log/OnlineClassificator.log

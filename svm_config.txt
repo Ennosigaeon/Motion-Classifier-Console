@@ -1,0 +1,7 @@
+plot.mean=1
+plot.variogramGraph=1
+plot.variogramSurface=1
+svm.cost=100
+svm.kernel=0
+svm.type=0
+variogram.nrBins=20
