@@ -4,12 +4,14 @@
 #include "h/EMGFileProvider.h"
 #include "h/Logger.h"
 #include "h/MultiClassSVM.h"
+#include "h/MSClassifier.h"
 #include "h/Properties.h"
 #include "h/SVMClassifier.h"
 #include "h/Sample.h"
 #include "h/Trainer.h"
+#include "h/Utilities.h"
 
-void testLogger(std::string message);
+using namespace motion_classifier;
 
 /**
 * It is necessary to pass an argument with the path to the configuration file.
@@ -21,7 +23,6 @@ int main(int argc, char *argv[]) {
 	//loads all configurations and inits the logging system
 	try {
 		motion_classifier::AppConfig::load(argc, argv);
-		Logger::getInstance()->addLogFunction(&testLogger);
 	}
 	catch (std::invalid_argument& ex) {
 		std::cerr << "Exception while loading configuration: " << ex.what() << std::endl;
@@ -34,14 +35,24 @@ int main(int argc, char *argv[]) {
 	//Therefor I added this block, so that both are destroyed before the end
 	//of the program is reached.
 	{
-		//configuration for SVMClassifier
-		Properties prop("svm_config.txt");
+		//configuration for Classifier
+		//Properties prop("svm_config.txt");
+		Properties prop("ms_config.txt");
 
 		//EMGOTProvider emgProvider{};
-		motion_classifier::EMGFileProvider emgProvider{ path };
-		motion_classifier::EMGProviderImpl *p = &emgProvider;
-		motion_classifier::MultiClassSVM svm(&prop);
-		motion_classifier::SVMClassifier classifier{ &emgProvider, &svm, &prop };
+		EMGFileProvider emgProvider{ path };
+		//MultiClassSVM svm(&prop);
+		//SVMClassifier classifier{ &emgProvider, &svm, &prop };
+		MSClassifier classifier{ &emgProvider, &prop };
+
+		//TODO: This line fails. Nothing happens
+		classifier.train(classifier.extractTrainingsData("C:/Tmp/RMS/"));
+		for (auto pair : *classifier.getTrainingsData()) {
+			std::ofstream out("C:/Tmp/Mean\ Shift/" + printMotion(pair.first) + ".txt");
+			for (auto vector : *pair.second)
+				out << *vector << std::endl;
+			out.close();
+		}
 
 		//motion_classifier::Trainer trainer{};
 		//auto trainingsData = trainer.train(&emgProvider);
@@ -59,8 +70,4 @@ int main(int argc, char *argv[]) {
 	std::cout << "Please press Enter to close program... ";
 	std::cin.get();
 	return EXIT_SUCCESS;
-}
-
-void testLogger(std::string message) {
-	std::cout << message << std::endl;
 }
