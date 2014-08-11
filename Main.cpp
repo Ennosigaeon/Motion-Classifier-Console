@@ -1,6 +1,9 @@
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
 
 #include <iostream>
 #include "h/AppConfig.h"
+#include "h/CrossCorrelation.h"
 #include "h/EMGFileProvider.h"
 #include "h/Logger.h"
 #include "h/MultiClassSVM.h"
@@ -29,7 +32,7 @@ int main(int argc, char *argv[]) {
 		std::cerr << "Motion-Classifier usage: " << motion_classifier::AppConfig::CONFIG_ARGUMENT << " <path_to_config>" << std::endl;
 	}
 
-	std::string path = "c:\\Users\\Marc\\Dropbox\\Informatik\\Studium\\6. Semester\\Bachelor Thesis\\MARC\\data\\data8_AN-format.txt";
+	std::string path = "c:\\Tmp\\data8_AN-f";
 
 	//It takes very much time to delete EMGProvider and/or Classifier.
 	//Therefor I added this block, so that both are destroyed before the end
@@ -44,23 +47,25 @@ int main(int argc, char *argv[]) {
 		//MultiClassSVM svm(&prop);
 		//SVMClassifier classifier{ &emgProvider, &svm, &prop };
 		MSClassifier classifier{ &emgProvider, &prop };
+		classifier.train("C:/Tmp/RMS/");
 
-		//TODO: This line fails. Nothing happens
-		classifier.train(classifier.extractTrainingsData("C:/Tmp/RMS/"));
-		for (auto pair : *classifier.getTrainingsData()) {
-			std::ofstream out("C:/Tmp/Mean\ Shift/" + printMotion(pair.first) + ".txt");
-			for (auto vector : *pair.second)
-				out << *vector << std::endl;
-			out.close();
-		}
+		CrossCorrelation correlation(&classifier);
+		correlation.testClassifier(correlation.loadData("C:/Tmp/RMS/", 1));
+
+//		for (const auto &pair : *classifier.getTrainingsData()) {
+//			std::ofstream out("C:/Tmp/Mean\ Shift/" + printMotion(pair.first) + ".txt");
+//			for (const auto &vector : *pair.second)
+//				out << *vector << std::endl;
+//			out.close();
+//		}
 
 		//motion_classifier::Trainer trainer{};
 		//auto trainingsData = trainer.train(&emgProvider);
 		//classifier.train(trainingsData);
 
-		classifier.send(motion_classifier::Signal::START);
-		std::this_thread::sleep_for(std::chrono::milliseconds(30000));
-		classifier.send(motion_classifier::Signal::SHUTDOWN);
+		//classifier.send(motion_classifier::Signal::START);
+		//std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+		//classifier.send(motion_classifier::Signal::SHUTDOWN);
 	}
 
 	//closes all open resources, releases heap memory, ...
