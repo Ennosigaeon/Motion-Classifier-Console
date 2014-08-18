@@ -12,3 +12,7 @@ space.y.min = 0
 space.y.max = 8
 space.z.min = 0
 space.z.max = 400
+#m = rows, n = columns, p = dimensions
+matrix.m = 2
+matrix.n = 8
+matrix.p = 10

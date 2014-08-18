@@ -1,6 +1,3 @@
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
-
 #include <iostream>
 #include "h/AppConfig.h"
 #include "h/CrossCorrelation.h"
@@ -22,7 +19,6 @@ using namespace motion_classifier;
 * with a whitespace before the path.
 */
 int main(int argc, char *argv[]) {
-
 	//loads all configurations and inits the logging system
 	try {
 		motion_classifier::AppConfig::load(argc, argv);
@@ -32,36 +28,21 @@ int main(int argc, char *argv[]) {
 		std::cerr << "Motion-Classifier usage: " << motion_classifier::AppConfig::CONFIG_ARGUMENT << " <path_to_config>" << std::endl;
 	}
 
-	std::string path = "c:\\Tmp\\data8_AN-f";
+	std::string path = "c:/Tmp/data/data8_AN-f";
 
 	//It takes very much time to delete EMGProvider and/or Classifier.
 	//Therefor I added this block, so that both are destroyed before the end
 	//of the program is reached.
 	{
 		//configuration for Classifier
-		//Properties prop("svm_config.txt");
 		Properties prop("ms_config.txt");
 
-		//EMGOTProvider emgProvider{};
 		EMGFileProvider emgProvider{ path };
-		//MultiClassSVM svm(&prop);
-		//SVMClassifier classifier{ &emgProvider, &svm, &prop };
 		MSClassifier classifier{ &emgProvider, &prop };
 		classifier.train("C:/Tmp/RMS/");
 
 		CrossCorrelation correlation(&classifier);
 		correlation.testClassifier(correlation.loadData("C:/Tmp/RMS/", 1));
-
-//		for (const auto &pair : *classifier.getTrainingsData()) {
-//			std::ofstream out("C:/Tmp/Mean\ Shift/" + printMotion(pair.first) + ".txt");
-//			for (const auto &vector : *pair.second)
-//				out << *vector << std::endl;
-//			out.close();
-//		}
-
-		//motion_classifier::Trainer trainer{};
-		//auto trainingsData = trainer.train(&emgProvider);
-		//classifier.train(trainingsData);
 
 		//classifier.send(motion_classifier::Signal::START);
 		//std::this_thread::sleep_for(std::chrono::milliseconds(10000));
